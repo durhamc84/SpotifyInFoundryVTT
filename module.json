@@ -2,10 +2,10 @@
   "id": "spotify-vtt-module",
   "title": "Spotify VTT Integration",
   "description": "Import Spotify playlists into Foundry VTT",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Zadar",
-  "manifest": "https://github.com/durhamc84/SpotifyInFoundryVTT/releases/download/1.0.0/module.json",
-  "download": "https://github.com/durhamc84/SpotifyInFoundryVTT/releases/download/1.0.0/module.zip",
+  "manifest": "https://github.com/durhamc84/SpotifyInFoundryVTT/releases/download/1.0.1/module.json",
+  "download": "https://github.com/durhamc84/SpotifyInFoundryVTT/releases/download/1.0.1/module.zip",
   "license": "LICENSE",
   "readme": "README.md",
   "url": "https://github.com/durhamc84/SpotifyInFoundryVTT",
@@ -19,13 +19,26 @@
     "src/spotify-playlist.js"
   ],
   "packs": [],
-  "media": {
-    "icon": "modules/spotify-playlist/icons/spotify-icon.png"
-  },
   "languages": [],
-  "systems": []
+  "systems": [],
+  "settings": [
+    {
+      "key": "spotifyAccessToken",
+      "name": "Spotify Access Token",
+      "hint": "Paste your Spotify Access Token here after authenticating via the OAuth flow.",
+      "scope": "client",
+      "config": true,
+      "type": "string",
+      "default": ""
+    },
+    {
+      "key": "playlistURL",
+      "name": "Spotify Playlist URL",
+      "hint": "Enter the Spotify Playlist URL you want to play.",
+      "scope": "client",
+      "config": true,
+      "type": "string",
+      "default": ""
+    }
+  ]
 }
-
-
-
-

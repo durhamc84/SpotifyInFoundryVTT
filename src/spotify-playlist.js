@@ -1,57 +1,99 @@
 // src/spotify-playlist.js
 
-const CLIENT_ID = 'your-spotify-client-id';  // Your registered Spotify Client ID
-const REDIRECT_URI = 'http://localhost:3000/auth/callback';  // Must match with the backend redirect URI
+// Register settings when the module is initialized
+Hooks.once('init', () => {
+    // Register the Spotify Access Token setting
+    game.settings.register("spotify-vtt-module", "spotifyAccessToken", {
+        name: "Spotify Access Token",
+        hint: "Paste your Spotify Access Token here after authenticating via the OAuth flow.",
+        scope: "client",
+        config: true,
+        type: String,
+        default: ""
+    });
 
-// Initialize the Web Playback SDK and authenticate Spotify users
-window.onSpotifyWebPlaybackSDKReady = () => {
-    const token = localStorage.getItem('spotifyAccessToken');
-    if (!token) {
-        authenticateSpotify();
+    // Register the Spotify Playlist URL setting
+    game.settings.register("spotify-vtt-module", "playlistURL", {
+        name: "Spotify Playlist URL",
+        hint: "Enter the Spotify Playlist URL you want to play.",
+        scope: "client",
+        config: true,
+        type: String,
+        default: ""
+    });
+});
+
+// When Foundry is ready, retrieve the settings and initialize playback
+Hooks.once('ready', () => {
+    const accessToken = game.settings.get('spotify-vtt-module', 'spotifyAccessToken');
+    const playlistURL = game.settings.get('spotify-vtt-module', 'playlistURL');
+
+    // Check if both access token and playlist URL are available
+    if (!accessToken || !playlistURL) {
+        ui.notifications.error('Please provide both a Spotify access token and playlist URL in the settings.');
         return;
     }
 
-    const player = new Spotify.Player({
-        name: 'Foundry VTT Spotify Player',
-        getOAuthToken: cb => { cb(token); },
-        volume: 0.5
-    });
+    // Initialize the Web Playback SDK
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        const player = new Spotify.Player({
+            name: 'Foundry VTT Spotify Player',
+            getOAuthToken: cb => { cb(accessToken); },  // Provide the access token
+            volume: 0.5
+        });
 
-    player.connect();
+        // Connect the player
+        player.connect();
 
-    player.addListener('player_state_changed', state => {
-        if (state) {
-            const currentTrack = state.track_window.current_track;
-            console.log('Currently Playing:', currentTrack);
-        }
-    });
+        // Listen for player readiness and start playback when ready
+        player.addListener('ready', ({ device_id }) => {
+            console.log('Ready with Device ID', device_id);
+            playSpotifyPlaylist(accessToken, playlistURL, device_id);  // Start playback
+        });
 
-    player.addListener('ready', ({ device_id }) => {
-        console.log('Device ID registered:', device_id);
-    });
+        // Handle state changes
+        player.addListener('player_state_changed', state => {
+            if (!state) return;
+            console.log('Player state changed:', state);
+        });
 
-    player.addListener('not_ready', ({ device_id }) => {
-        console.log('Device ID has gone offline:', device_id);
-    });
-};
+        // Handle player disconnection
+        player.addListener('not_ready', ({ device_id }) => {
+            console.log('Device ID has gone offline', device_id);
+        });
+    };
+});
 
-// Spotify authentication flow
-function authenticateSpotify() {
-    const authUrl = `http://localhost:5000/auth/login`;  // Redirects to the backend login
-    window.location.href = authUrl;
-}
+// Function to start Spotify playback using the playlist URL
+function playSpotifyPlaylist(accessToken, playlistURL, deviceId) {
+    const playlistId = extractPlaylistId(playlistURL);
 
-// Handle authentication callback
-function handleSpotifyAuthCallback() {
-    const hash = window.location.hash;
-    if (hash) {
-        const params = new URLSearchParams(hash.substr(1));
-        const accessToken = params.get('access_token');
-        if (accessToken) {
-            localStorage.setItem('spotifyAccessToken', accessToken);
-            window.location.hash = '';
-        }
+    if (!playlistId) {
+        ui.notifications.error('Invalid Spotify playlist URL.');
+        return;
     }
+
+    fetch(`https://api.spotify.com/v1/me/player/play`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            context_uri: `spotify:playlist:${playlistId}`,
+            device_ids: [deviceId]
+        })
+    }).then(response => {
+        if (response.status === 204) {
+            console.log('Playback started');
+        } else {
+            console.error('Playback error:', response);
+        }
+    });
 }
 
-handleSpotifyAuthCallback();
+// Helper function to extract the playlist ID from a Spotify URL
+function extractPlaylistId(playlistURL) {
+    const match = playlistURL.match(/playlist\/([a-zA-Z0-9]+)/);
+    return match ? match[1] : null;
+}

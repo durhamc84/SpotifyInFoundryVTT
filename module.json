@@ -1,0 +1,30 @@
+{
+  "id": "spotify-In-foundryvtt",
+  "title": "Spotify In Foundry VTT",
+  "description": "Import Spotify playlists into Foundry VTT",
+  "version": "1.0.0",
+  "author": "Zadar",
+  "manifest": "", //"https://github.com/durhamc84/ZadarsHelpfulMacros/releases/download/1.0.29/module.json",
+  "download": "", //"https://github.com/durhamc84/ZadarsHelpfulMacros/releases/download/1.0.29/module.zip",
+  "license": "LICENSE",
+  "readme": "README.md",
+  "url": "", //"https://github.com/durhamc84/ZadarsHelpfulMacros",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12",
+    "maximum": "12"
+  },
+  "styles": [],
+  "esmodules": [
+    "spotify-playlist.js"
+  ],
+  "packs": [],
+  "media": {
+    "icon": "modules/spotify-playlist/icons/spotify-icon.png"
+  },
+  "languages": [],
+  "systems": []
+}
+
+
+

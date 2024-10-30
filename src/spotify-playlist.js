@@ -51,20 +51,21 @@ Hooks.once('ready', () => {
             playSpotifyPlaylist(accessToken, playlistURL, device_id);  // Start playback
         });
 
-        // Handle state changes
         player.addListener('player_state_changed', state => {
             if (!state) return;
             console.log('Player state changed:', state);
         });
 
-        // Handle player disconnection
         player.addListener('not_ready', ({ device_id }) => {
             console.log('Device ID has gone offline', device_id);
         });
     };
+
+    // Fetch and display user profile after the module is loaded
+    getUserProfile(accessToken);
 });
 
-// Function to start Spotify playback using the playlist URL
+// Function to play Spotify Playlist using the Web Playback SDK
 function playSpotifyPlaylist(accessToken, playlistURL, deviceId) {
     const playlistId = extractPlaylistId(playlistURL);
 
@@ -92,7 +93,25 @@ function playSpotifyPlaylist(accessToken, playlistURL, deviceId) {
     });
 }
 
-// Helper function to extract the playlist ID from a Spotify URL
+// Function to fetch the current user's Spotify profile
+async function getUserProfile(accessToken) {
+    const response = await fetch('https://api.spotify.com/v1/me', {
+        headers: {
+            Authorization: 'Bearer ' + accessToken
+        }
+    });
+
+    if (!response.ok) {
+        console.error('Failed to fetch user profile:', response.statusText);
+        return null;
+    }
+
+    const profileData = await response.json();
+    console.log('User Profile:', profileData);
+    return profileData;
+}
+
+// Helper function to extract the playlist ID from the Spotify URL
 function extractPlaylistId(playlistURL) {
     const match = playlistURL.match(/playlist\/([a-zA-Z0-9]+)/);
     return match ? match[1] : null;

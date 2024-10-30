@@ -29,13 +29,18 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="icons\spotify-icon.png" />
     <Content Include="module.json" />
+    <Content Include="public\index.html" />
     <Content Include="README.md" />
-    <Content Include="spotify-playlist.js" />
+    <Content Include="server\.env" />
+    <Content Include="server\index.js" />
+    <Content Include="src\setupProxy.js" />
+    <Content Include="src\spotify-playlist.js" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="icons\" />
+    <Folder Include="public\" />
+    <Folder Include="src\" />
+    <Folder Include="server\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <ProjectExtensions>

@@ -1,6 +1,6 @@
 {
-  "id": "spotify-In-foundryvtt",
-  "title": "Spotify In Foundry VTT",
+  "id": "spotify-vtt-module",
+  "title": "Spotify VTT Integration",
   "description": "Import Spotify playlists into Foundry VTT",
   "version": "1.0.0",
   "author": "Zadar",
@@ -16,7 +16,7 @@
   },
   "styles": [],
   "esmodules": [
-    "spotify-playlist.js"
+    "src/spotify-playlist.js"
   ],
   "packs": [],
   "media": {
@@ -25,6 +25,7 @@
   "languages": [],
   "systems": []
 }
+
 
 
 
